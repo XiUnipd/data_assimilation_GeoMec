@@ -1,5 +1,8 @@
 # ES-MDA Subsidence Data Assimilation
 
+![Assimilation result](docs/images/ECDF_X_curr_5mm.png)
+
+
 ## Attention!!!
 This workflow is only suitable for those who are using GEPS3D developed by dICEA-Unipd
 
