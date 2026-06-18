@@ -1,5 +1,9 @@
 # ES-MDA Subsidence Data Assimilation
 
+## Attention!!!
+This workflow is only suitable for those who are using GEPS3D developed by dICEA-Unipd
+
+## Description
 A modular Python workflow for assimilating observed land-subsidence data into
 an ensemble of geomechanical simulations with the Ensemble Smoother with
 Multiple Data Assimilation (ES-MDA).
