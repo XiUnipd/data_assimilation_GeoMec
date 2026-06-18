@@ -1,0 +1,63 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDE files
+.idea/
+.vscode/
+
+# macOS
+.DS_Store
+
+# Outputs
+comparison_outputs/*
+!comparison_outputs/.gitkeep
+
+# Test
+tests/*
+
+# Large data files
+*.csv
+*.xlsx
+*.xls
+*.npy
+*.npz
+*.mat
+*.vtk
+*.vtu
+*.pvd
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.bak
+
+# Codex
+.codex/
+
+# IDE
+.idea/
+
+# Screts
+.env
+*.pem
+*.key
+id_rsa
+id_ed25519
+credentials/
+secrets/
+
+# Local project configuration (contains machine-specific paths)
+/data_assimilation/config.py
+!/data_assimilation/config.example.py
+
+#Python file
+ESMDA_assimilate_solbox_covariance.py
