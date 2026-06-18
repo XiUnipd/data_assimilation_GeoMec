@@ -172,6 +172,8 @@ def main() -> dict[str, Any]:
             "mesh_file": str(config.MESH_GRID_FILE),
             "solbox_dir": str(config.POT_DIR),
             "cm_prior_dir": str(config.MAT_DIR),
+            "parameter_names": list(config.PARAMETER_NAMES),
+            "assimilated_lithologies": list(config.ASSIMILATED_LITHOLOGIES),
         },
     )
     Z_prior, _ = nscore_forward(mat_matrix)
@@ -184,13 +186,15 @@ def main() -> dict[str, Any]:
         figures_dir=config.FIGURES_DIR,
         seed=config.SEED,
         inversion=config.INVERSION,
+        parameter_names=config.PARAMETER_NAMES,
+        assimilated_lithologies=config.ASSIMILATED_LITHOLOGIES,
     )
     plot_linear_and_z_results(
         mat_matrix,
         Z_prior,
         X_posterior,
         Z_posterior,
-        param_names=config.PARAM_NAMES,
+        param_names=config.PARAMETER_NAMES,
         out_prefix="ESMDA_K",
         out_dir=config.RESULTS_DIR,
         show=False,
@@ -198,7 +202,7 @@ def main() -> dict[str, Any]:
     export_posterior_csvs(
         X_posterior,
         Z_posterior,
-        config.PARAM_NAMES,
+        config.PARAMETER_NAMES,
         config.RESULTS_DIR,
     )
     return {

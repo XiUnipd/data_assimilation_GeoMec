@@ -45,7 +45,17 @@ X_COLUMN = os.getenv("ESMDA_X_COLUMN", "X_mean")
 Y_COLUMN = os.getenv("ESMDA_Y_COLUMN", "Y_mean")
 SEED = 1688
 INVERSION = "subspace"
-PARAM_NAMES = ("Gravel", "Sand", "Silty", "Clay")
+PARAMETER_NAMES = ["Gravel", "Sand", "Silty", "Clay"]
+
+_assimilated_lithologies = os.getenv("ESMDA_ASSIMILATED_LITHOLOGIES")
+ASSIMILATED_LITHOLOGIES = (
+    [name.strip() for name in _assimilated_lithologies.split(",") if name.strip()]
+    if _assimilated_lithologies is not None
+    else ["Clay"]
+)
+
+# Backward-compatible output-label alias. New code should use PARAMETER_NAMES.
+PARAM_NAMES = tuple(PARAMETER_NAMES)
 
 
 # ==============================================================================

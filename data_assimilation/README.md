@@ -45,6 +45,22 @@ export ESMDA_FIGURES_DIR=/path/to/results/Figures
 export ESMDA_ROUNDS=5
 ```
 
+Choose the Cm parameter rows that enter ES-MDA in the local `config.py`:
+
+```python
+PARAMETER_NAMES = ["Gravel", "Sand", "Silty", "Clay"]
+ASSIMILATED_LITHOLOGIES = ["Clay"]
+```
+
+Clay-only assimilation is the default. Names are case-sensitive; empty,
+unknown, and duplicate selections are rejected. All four Cm rows are still
+read and exported, while unselected posterior rows remain exactly equal to
+their prior values. A one-run override is also supported:
+
+```bash
+export ESMDA_ASSIMILATED_LITHOLOGIES=Gravel,Sand
+```
+
 ## Run
 
 From inside this directory:
@@ -100,12 +116,13 @@ years_annual = years[1:]
 column per ensemble member. The covariance vector follows that identical plan;
 input standard deviations are converted to variances with `std_vec ** 2`.
 
-ES-MDA uses the configured number of rounds, seed `168`, and `subspace`
-inversion. Each round retains the original physical-space update:
+ES-MDA uses the configured number of rounds, seed, and `subspace` inversion.
+Each round retains the physical-space update for the selected rows:
 
 ```python
-X_curr_log = smoother.assimilate(X_curr_log, Y=Y_curr)
-X_curr = X_curr_log
+selected_prior = X_curr_log[selected_indices, :]
+selected_posterior = smoother.assimilate(selected_prior, Y=Y_curr)
+X_curr_log[selected_indices, :] = selected_posterior
 ```
 
 ## Current limitations

@@ -163,6 +163,22 @@ export ESMDA_YEAR_MIN=1900
 export ESMDA_YEAR_MAX=2099
 ```
 
+Select the Cm lithologies that enter ES-MDA in the local `config.py`:
+
+```python
+PARAMETER_NAMES = ["Gravel", "Sand", "Silty", "Clay"]
+ASSIMILATED_LITHOLOGIES = ["Clay"]
+```
+
+The default updates only Clay. Other valid choices include
+`["Gravel", "Sand"]` or all four names. Matching is case-sensitive; empty,
+unknown, and duplicate selections are rejected. Unselected posterior rows
+remain exactly equal to their prior values. A one-run override is supported:
+
+```bash
+export ESMDA_ASSIMILATED_LITHOLOGIES=Gravel,Sand
+```
+
 The current ES-MDA seed is `1688` and the inversion method is `subspace`.
 
 ## Run the workflow
@@ -198,9 +214,12 @@ ordering rules are critical and covered by automated tests.
 The current update remains in the physical parameter matrix:
 
 ```python
-X_curr_log = smoother.assimilate(X_curr_log, Y=Y_curr)
-X_curr = X_curr_log
+selected_prior = X_curr_log[selected_indices, :]
+selected_posterior = smoother.assimilate(selected_prior, Y=Y_curr)
+X_curr_log[selected_indices, :] = selected_posterior
 ```
+
+The complete four-row matrix is still read, plotted, returned, and exported.
 
 ## Outputs
 

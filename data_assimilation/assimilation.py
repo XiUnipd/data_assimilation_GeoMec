@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import Any, Sequence
 
 import numpy as np
 
@@ -17,6 +17,44 @@ from .plotting import (
     plot_round_pre_post_scatter,
 )
 from .transforms import nscore_forward
+
+
+def resolve_assimilated_indices(
+    parameter_names: Sequence[str],
+    assimilated_lithologies: Sequence[str],
+    n_parameter_rows: int,
+) -> np.ndarray:
+    """Validate configured lithologies and return canonical matrix-row indices.
+
+    Selection is strict and case-sensitive. The returned order always follows
+    ``parameter_names`` rather than the configured selection order.
+    """
+    names = list(parameter_names)
+    selected = list(assimilated_lithologies)
+    if len(names) != n_parameter_rows:
+        raise ValueError(
+            f"PARAMETER_NAMES has {len(names)} entries but mat_matrix has "
+            f"{n_parameter_rows} parameter rows."
+        )
+    if len(set(names)) != len(names):
+        raise ValueError(f"PARAMETER_NAMES contains duplicates: {names}")
+    if not selected:
+        raise ValueError("ASSIMILATED_LITHOLOGIES must contain at least one lithology.")
+    if len(set(selected)) != len(selected):
+        raise ValueError(
+            f"ASSIMILATED_LITHOLOGIES contains duplicates: {selected}"
+        )
+    unknown = [name for name in selected if name not in names]
+    if unknown:
+        raise ValueError(
+            f"Unknown ASSIMILATED_LITHOLOGIES values: {unknown}. "
+            f"Allowed values are {names}; matching is case-sensitive."
+        )
+    selected_set = set(selected)
+    return np.asarray(
+        [index for index, name in enumerate(names) if name in selected_set],
+        dtype=int,
+    )
 
 
 def validate_assimilation_shapes(
@@ -62,6 +100,10 @@ def run_assimilation(
     figures_dir: str | Path,
     seed: int = config.SEED,
     inversion: str = config.INVERSION,
+    parameter_names: Sequence[str] = tuple(config.PARAMETER_NAMES),
+    assimilated_lithologies: Sequence[str] = tuple(
+        config.ASSIMILATED_LITHOLOGIES
+    ),
 ) -> tuple[np.ndarray, np.ndarray, dict[str, Any]]:
     """Run the original ES-MDA loop and return posterior arrays and diagnostics.
 
@@ -72,6 +114,16 @@ def run_assimilation(
     validate_assimilation_shapes(observations, Y_model, mat_matrix, covariance)
     if n_assim <= 0:
         raise ValueError(f"n_assim must be positive, got {n_assim}")
+    selected_indices = resolve_assimilated_indices(
+        parameter_names,
+        assimilated_lithologies,
+        mat_matrix.shape[0],
+    )
+    all_indices = np.arange(mat_matrix.shape[0], dtype=int)
+    unselected_indices = np.setdiff1d(all_indices, selected_indices)
+    selected_names = [parameter_names[index] for index in selected_indices]
+    print(f"Assimilated lithologies: {selected_names}")
+    print(f"Assimilated parameter row indices: {selected_indices.tolist()}")
 
     # Lazy import keeps package imports free of assimilation execution and lets
     # pure reader/ordering tests run without this optional runtime dependency.
@@ -110,7 +162,15 @@ def run_assimilation(
         print("Std(X_curr_log) per param =", parameter_std)
 
         X_pre_log = X_curr_log.copy()
-        X_curr_log = smoother.assimilate(X_curr_log, Y=Y_curr)
+        selected_prior = X_curr_log[selected_indices, :].copy()
+        selected_posterior = smoother.assimilate(selected_prior, Y=Y_curr)
+        X_curr_log[selected_indices, :] = selected_posterior
+        if unselected_indices.size and not np.array_equal(
+            X_curr_log[unselected_indices, :], X_init[unselected_indices, :]
+        ):
+            raise RuntimeError(
+                "An unselected lithology changed during ES-MDA assimilation."
+            )
         save_comparison_array(
             f"X_after_assim_round_{iteration}", X_curr_log
         )
@@ -129,13 +189,24 @@ def run_assimilation(
                 "max_abs_y_difference": max_y_difference,
                 "mean_y_variance": mean_y_variance,
                 "parameter_std": parameter_std.copy(),
+                "assimilated_lithologies": selected_names.copy(),
+                "assimilated_indices": selected_indices.copy(),
             }
         )
 
     if Z_curr is None:
         raise RuntimeError("ES-MDA produced no assimilation rounds")
     X_posterior = X_curr
+    if unselected_indices.size and not np.array_equal(
+        X_posterior[unselected_indices, :], X_init[unselected_indices, :]
+    ):
+        raise RuntimeError("Final posterior changed an unselected lithology.")
     # Preserve source semantics: this is Z computed before the final update.
     Z_posterior = Z_curr
     save_comparison_array("X_final_posterior", X_posterior)
-    return X_posterior, Z_posterior, {"rounds": rounds}
+    return X_posterior, Z_posterior, {
+        "rounds": rounds,
+        "assimilated_lithologies": selected_names,
+        "assimilated_indices": selected_indices.copy(),
+        "unselected_indices": unselected_indices.copy(),
+    }
