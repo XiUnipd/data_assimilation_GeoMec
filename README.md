@@ -4,7 +4,7 @@
 
 
 ## Attention!!!
-This workflow is only suitable for those who are using GEPS3D developed by dICEA-Unipd
+This workflow is only suitable for those who are using GEPS3D/SUB3D developed by dICEA-Unipd
 
 ## Description
 A modular Python workflow for assimilating observed land-subsidence data into
