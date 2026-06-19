@@ -58,7 +58,20 @@ read and exported, while unselected posterior rows remain exactly equal to
 their prior values. A one-run override is also supported:
 
 ```bash
+export ESMDA_USE_LITHOLOGY_ENV_OVERRIDE=1
 export ESMDA_ASSIMILATED_LITHOLOGIES=Gravel,Sand
+```
+
+Without the explicit override switch, the environment selection is ignored and
+the list written directly in `config.py` is authoritative.
+
+All existing `print()` diagnostics are mirrored to `esmda_run.log` in the
+repository root and remain visible in the terminal. The log is overwritten on
+every run. It can be relocated or disabled with:
+
+```bash
+export ESMDA_RUN_LOG_FILE=/path/to/esmda_run.log
+export ESMDA_RUN_LOG_ENABLED=0
 ```
 
 ## Run

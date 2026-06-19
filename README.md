@@ -176,7 +176,21 @@ unknown, and duplicate selections are rejected. Unselected posterior rows
 remain exactly equal to their prior values. A one-run override is supported:
 
 ```bash
+export ESMDA_USE_LITHOLOGY_ENV_OVERRIDE=1
 export ESMDA_ASSIMILATED_LITHOLOGIES=Gravel,Sand
+```
+
+The environment value is ignored unless the override switch is explicitly
+enabled, so editing `ASSIMILATED_LITHOLOGIES` in `config.py` remains the normal
+and authoritative control path.
+
+Program output is mirrored to `esmda_run.log` in the repository root. The file
+is overwritten at the start of every run, while the same messages remain
+visible in the terminal. Override or disable it with:
+
+```bash
+export ESMDA_RUN_LOG_FILE=/path/to/esmda_run.log
+export ESMDA_RUN_LOG_ENABLED=0
 ```
 
 The current ES-MDA seed is `1688` and the inversion method is `subspace`.
@@ -231,6 +245,8 @@ The workflow generates:
 - Per-round empirical CDF plots
 - Final prior/posterior comparison figures
 - Printed shape and variance diagnostics for each assimilation round
+- Root-level `esmda_run.log` containing the complete stdout/stderr stream from
+  the latest run
 
 ## Current limitations
 

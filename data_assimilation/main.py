@@ -19,6 +19,7 @@ from data_assimilation.assimilation import run_assimilation
 from data_assimilation.comparison import save_comparison_array, save_comparison_json
 from data_assimilation.covariance import build_diagonal_covariance
 from data_assimilation.io_utils import load_table_auto
+from data_assimilation.logging_utils import capture_console_output
 from data_assimilation.mesh_mapping import (
     _load_tags,
     _load_tags_xyz_helper,
@@ -220,4 +221,9 @@ def main() -> dict[str, Any]:
 
 
 if __name__ == "__main__":
-    main()
+    with capture_console_output(
+        config.RUN_LOG_FILE,
+        enabled=config.RUN_LOG_ENABLED,
+        mode=config.RUN_LOG_MODE,
+    ):
+        main()

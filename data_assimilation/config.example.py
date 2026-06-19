@@ -45,17 +45,52 @@ X_COLUMN = os.getenv("ESMDA_X_COLUMN", "X_mean")
 Y_COLUMN = os.getenv("ESMDA_Y_COLUMN", "Y_mean")
 SEED = 1688
 INVERSION = "subspace"
-PARAMETER_NAMES = ["Gravel", "Sand", "Silty", "Clay"]
 
-_assimilated_lithologies = os.getenv("ESMDA_ASSIMILATED_LITHOLOGIES")
-ASSIMILATED_LITHOLOGIES = (
-    [name.strip() for name in _assimilated_lithologies.split(",") if name.strip()]
-    if _assimilated_lithologies is not None
-    else ["Clay"]
-)
+
+# ==============================================================================
+# +--------------------------------------------------------------------------+
+# | LITHOLOGY PARAMETERS INCLUDED IN ES-MDA                                  |
+# | Edit ASSIMILATED_LITHOLOGIES directly to select parameter rows.          |
+# | This direct config is authoritative unless env override is enabled.      |
+# +--------------------------------------------------------------------------+
+# ==============================================================================
+PARAMETER_NAMES = ["Gravel", "Sand", "Silty", "Clay"]
+ASSIMILATED_LITHOLOGIES = ["Clay"]
+
+# Keep False for normal runs. It may be set to True locally or enabled through
+# ESMDA_USE_LITHOLOGY_ENV_OVERRIDE=1 by automation/comparison scripts.
+USE_LITHOLOGY_ENV_OVERRIDE = False
+if os.getenv("ESMDA_USE_LITHOLOGY_ENV_OVERRIDE", "0") == "1":
+    USE_LITHOLOGY_ENV_OVERRIDE = True
+
+if USE_LITHOLOGY_ENV_OVERRIDE:
+    _assimilated_lithologies = os.getenv("ESMDA_ASSIMILATED_LITHOLOGIES")
+    if _assimilated_lithologies is None:
+        raise ValueError(
+            "ESMDA_ASSIMILATED_LITHOLOGIES is required when "
+            "USE_LITHOLOGY_ENV_OVERRIDE is enabled."
+        )
+    ASSIMILATED_LITHOLOGIES = [
+        name.strip()
+        for name in _assimilated_lithologies.split(",")
+        if name.strip()
+    ]
 
 # Backward-compatible output-label alias. New code should use PARAMETER_NAMES.
 PARAM_NAMES = tuple(PARAMETER_NAMES)
+
+
+# ==============================================================================
+# +--------------------------------------------------------------------------+
+# | RUN LOGGING                                                              |
+# |                                                                          |
+# | DEFAULT: ENABLED, OVERWRITE THE PREVIOUS LOG ON EACH RUN                 |
+# | Existing print output is mirrored to both terminal and this log file.    |
+# +--------------------------------------------------------------------------+
+# ==============================================================================
+RUN_LOG_ENABLED = os.getenv("ESMDA_RUN_LOG_ENABLED", "1") == "1"
+RUN_LOG_FILE = _path_from_env("ESMDA_RUN_LOG_FILE", PROJECT_ROOT / "esmda_run.log")
+RUN_LOG_MODE = "w"
 
 
 # ==============================================================================
