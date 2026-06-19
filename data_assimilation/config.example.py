@@ -19,27 +19,32 @@ def _path_from_env(name: str, default: str | Path) -> Path:
     return Path(os.getenv(name, str(default))).expanduser()
 
 
-# Example layout. Change DATA_DIR or override individual paths via environment.
-DATA_DIR = _path_from_env("ESMDA_DATA_DIR", PROJECT_ROOT / "data")
-INPUT_DIR = _path_from_env("ESMDA_INPUT_DIR", DATA_DIR / "mesh")
+# Synthetic input examples included with the public repository. Individual
+# paths can still be overridden through their corresponding environment vars.
+SAMPLE_INPUT_DIR = PROJECT_ROOT / "sample_input_files"
+INPUT_DIR = _path_from_env("ESMDA_INPUT_DIR", SAMPLE_INPUT_DIR)
 MESH_GRID_FILE = _path_from_env(
     "ESMDA_MESH_GRID_FILE", INPUT_DIR / "mesh.grid_zones"
 )
-POT_DIR = _path_from_env("ESMDA_POT_DIR", DATA_DIR / "solbox")
-NODE_DIR = _path_from_env("ESMDA_NODE_FILE", DATA_DIR / "node_to_be_DA.xlsx")
-OBS_FILE = _path_from_env("ESMDA_OBS_FILE", DATA_DIR / "observations.xlsx")
-COVARIANCE_FILE = _path_from_env(
-    "ESMDA_COVARIANCE_FILE", DATA_DIR / "standard_deviations.xlsx"
+POT_DIR = _path_from_env("ESMDA_POT_DIR", SAMPLE_INPUT_DIR / "solbox")
+NODE_DIR = _path_from_env(
+    "ESMDA_NODE_FILE", SAMPLE_INPUT_DIR / "node_to_be_DA.xlsx"
 )
-MAT_DIR = _path_from_env("ESMDA_MAT_DIR", DATA_DIR / "cm_prior")
+OBS_FILE = _path_from_env(
+    "ESMDA_OBS_FILE", SAMPLE_INPUT_DIR / "observations.xlsx"
+)
+COVARIANCE_FILE = _path_from_env(
+    "ESMDA_COVARIANCE_FILE", SAMPLE_INPUT_DIR / "standard_deviations.xlsx"
+)
+MAT_DIR = _path_from_env("ESMDA_MAT_DIR", SAMPLE_INPUT_DIR / "cm_prior")
 
 RESULTS_DIR = _path_from_env("ESMDA_RESULTS_DIR", PROJECT_ROOT / "results")
 FIGURES_DIR = _path_from_env("ESMDA_FIGURES_DIR", RESULTS_DIR / "Figures")
 
-N_ENSEMBLE = int(os.getenv("ESMDA_N_ENSEMBLE", "100"))
-N_ASSIM = int(os.getenv("ESMDA_ROUNDS", "3"))
-YEAR_MIN = int(os.getenv("ESMDA_YEAR_MIN", "1900"))
-YEAR_MAX = int(os.getenv("ESMDA_YEAR_MAX", "2099"))
+N_ENSEMBLE = int(os.getenv("ESMDA_N_ENSEMBLE", "3"))
+N_ASSIM = int(os.getenv("ESMDA_ROUNDS", "2"))
+YEAR_MIN = int(os.getenv("ESMDA_YEAR_MIN", "1992"))
+YEAR_MAX = int(os.getenv("ESMDA_YEAR_MAX", "1994"))
 
 X_COLUMN = os.getenv("ESMDA_X_COLUMN", "X_mean")
 Y_COLUMN = os.getenv("ESMDA_Y_COLUMN", "Y_mean")

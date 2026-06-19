@@ -1,0 +1,6 @@
+# Re-include public synthetic input examples ignored by the repository-wide
+# large-data patterns. These files are intentionally small and contain no real
+# research data.
+!*.xlsx
+!solbox/
+!solbox/*.csv
