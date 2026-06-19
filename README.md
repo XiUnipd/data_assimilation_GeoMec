@@ -21,13 +21,10 @@ implementations.
 
 - Reads observation and uncertainty tables from CSV or Excel.
 - Maps observation coordinates to mesh nodes with `scipy.spatial.cKDTree`.
-- Reads ensembles of `solboxNNN.csv` settlement simulations.
-- Converts cumulative settlement in metres to adjacent-year differences in
-  millimetres.
+- Reads ensembles of `solboxNNN.csv` displacement simulations.
 - Reads Gravel, Sand, Silty, and Clay prior `Cm` parameters.
-- Runs deterministic multi-round ES-MDA with a fixed seed.
+- Runs deterministic multi-round ES-MDA with a seed given by the user.
 - Exports posterior parameter ensembles and diagnostic figures.
-- Provides strict original-versus-refactored consistency testing.
 
 ## Repository structure
 
@@ -87,7 +84,6 @@ The first line must contain the value used by the original reader to calculate:
 skiprows = int(second_header_token) + 2
 ```
 
-The resulting numeric table must contain node ID, X, Y, and Z columns.
 
 ### Node workbook
 
@@ -247,12 +243,3 @@ The workflow generates:
 - Printed shape and variance diagnostics for each assimilation round
 - Root-level `esmda_run.log` containing the complete stdout/stderr stream from
   the latest run
-
-## Current limitations
-
-- Normal-score transforms are calculated for diagnostics and figures, but
-  `Z_curr` is not the actual assimilation space.
-- No explicit positivity constraint, clipping, bounds, or positive transform is
-  active, despite wording in the original script header.
-- The material reader uses fixed file-line positions and does not validate the
-  trailing material labels.
