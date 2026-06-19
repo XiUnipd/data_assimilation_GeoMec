@@ -47,12 +47,14 @@ YEAR_MAX = 1994
 
 The normal output and lithology-selection settings may remain unchanged.
 
-## File descriptions
+# File descriptions
 
 ### `mesh.grid_zones`
 
 - First line: `number_of_nodes number_of_elements`.
+- Keep fixed the second line.
 - The current reader calculates `skiprows = number_of_elements + 2`.
+- The first numeric block contains: `element_id`, `node_1`, `node_2`, `node_3`, `node_4`, `lithology`, `zone`.
 - The final numeric block has four columns: `node_id`, `X`, `Y`, `Z`.
 - This sample contains four nodes with IDs 1–4 and fictitious coordinates.
 
@@ -66,7 +68,7 @@ The normal output and lithology-selection settings may remain unchanged.
 ### `observations.xlsx`
 
 - One row per observation point.
-- Required coordinate columns: `X_mean` and `Y_mean`.
+- Required coordinate columns: `X_mean` and `Y_mean`. They mean the coordinates of the measurement point.
 - Year columns contain a four-digit year, for example `Y1992_mean`.
 - Values represent observed annual settlement in millimetres.
 - Blank cells demonstrate supported missing observations.
@@ -81,6 +83,7 @@ The normal output and lithology-selection settings may remain unchanged.
 
 ### `solbox/solboxNNN.csv`
 
+- They are the results given by the Geomechanical model (GEPS3D).
 - First column: `node`.
 - Remaining columns: calendar-year labels and cumulative settlement in metres.
 - Node IDs must be unique and must match `node_to_be_DA.xlsx`.
@@ -97,6 +100,7 @@ The normal output and lithology-selection settings may remain unchanged.
 
 ### `cm_prior/mat_NNN`
 
+- They are the material prior generated according to your given type of distribution.
 - Files are ordered by their trailing number.
 - The reader skips the header and reads the second token from the next four
   rows as Gravel, Sand, Silty, and Clay Cm values.
@@ -104,14 +108,3 @@ The normal output and lithology-selection settings may remain unchanged.
   three-zone file layout but are not read by the current Cm reader.
 - `mat_mean` demonstrates a non-ensemble summary file. It sorts after numbered
   files and is excluded when `N_ENSEMBLE = 3`.
-
-## Cross-file consistency
-
-- Mesh, node workbook, and solbox files all use node IDs 1–4.
-- Observation coordinates `(0, 0)` and `(100, 100)` coincide with mesh nodes 1
-  and 4.
-- Observation and standard-deviation tables use the same rows and years.
-- Three solbox files and three numbered Cm files correspond to
-  `N_ENSEMBLE = 3`.
-- All values are deterministic examples intended only to document formats and
-  exercise the input readers.
