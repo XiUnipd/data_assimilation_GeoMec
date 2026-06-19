@@ -243,3 +243,7 @@ The workflow generates:
 - Printed shape and variance diagnostics for each assimilation round
 - Root-level `esmda_run.log` containing the complete stdout/stderr stream from
   the latest run
+
+## TO BE NOTED
+- The reason why the assimilation results in the current version do not change with the selected lithologies is that the prior ensemble was manually adjusted during its generation. As a result, the parameters of different lithologies are not independent, but are linked through certain mathematical relationships. 
+- Therefore, whether only one lithology is assimilated or different combinations of lithologies are assimilated simultaneously, the final results remain the same.
